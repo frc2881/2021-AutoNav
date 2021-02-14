@@ -38,7 +38,10 @@ public class Drive extends SubsystemBase {
   DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
 
-
+  public void drive(double left, double right)
+  {
+    splitArcade.arcadeDrive(left, right);
+  }
   
   /** Creates a new Drive. */
   public Drive() { 
@@ -78,7 +81,6 @@ public class Drive extends SubsystemBase {
         rightEncoder = rightFront.getEncoder();
         rightEncoder.setPositionConversionFactor(distancePerPulse);
         rightEncoder.setPosition(0);
-
 
   }
 
