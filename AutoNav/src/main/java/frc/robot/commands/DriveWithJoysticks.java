@@ -4,22 +4,26 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drive;
 
 public class DriveWithJoysticks extends CommandBase {
 private final Drive m_drive;
-private final RobotContainer m_robotContainer;
+private final DoubleSupplier m_getDriverLeftY;
+private final DoubleSupplier m_getDriverRightX;
+
 
   /** Creates a new DriveWithJoysticks. */
-  public DriveWithJoysticks(Drive drive, RobotContainer robotcontainer) {
+  public DriveWithJoysticks(Drive drive, DoubleSupplier getDriverLeftY, DoubleSupplier getDriverRightX) {
     m_drive = drive;
-    m_robotContainer = robotcontainer;
+    m_getDriverLeftY = getDriverLeftY;
+    m_getDriverRightX = getDriverRightX;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_drive);
-  }
 
+  }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -28,14 +32,13 @@ private final RobotContainer m_robotContainer;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xSpeed = (m_robotContainer.getDriverLeftY());
-    double zRotation = (m_robotContainer.getDriverRightX());
-    m_drive.arcadeDrive(xSpeed, zRotation);
+    m_drive.arcadeDrive(m_getDriverLeftY.getAsDouble(), m_getDriverRightX.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override
