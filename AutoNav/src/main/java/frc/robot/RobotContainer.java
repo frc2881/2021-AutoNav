@@ -34,8 +34,8 @@ import frc.robot.subsystems.Drive;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private DoubleSupplier m_getDriverRightX;
-  private DoubleSupplier m_getDriverLeftY;
+  private DoubleSupplier m_getDriverRightX = () -> getDriverRightX();
+  private DoubleSupplier m_getDriverLeftY = () -> getDriverLeftY();
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Drive m_drive = new Drive();
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -91,11 +91,12 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
+    //original voltage number is 10 not 3.5 (altered for romi)
     var autoVoltageConstraint = new DifferentialDriveVoltageConstraint
       ( new SimpleMotorFeedforward( Constants.ksVolts, 
        Constants.kvVoltSecondsPerMeter,
        Constants.kaVoltSecondsSquaredPerMeter),
-       Constants.kDriveKinematics, 10);
+       Constants.kDriveKinematics, 3.5);
 
 
     TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond,
