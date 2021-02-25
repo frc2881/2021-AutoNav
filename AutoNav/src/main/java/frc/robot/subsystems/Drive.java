@@ -9,21 +9,30 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.utils.DistancePerPulse;
 import frc.robot.utils.NavX;
 
 public class Drive extends SubsystemBase {
   
+  private PWM leftRomi;
+  private PWM rightRomi;
+  private DigitalInput leftenc;
+  private DigitalInput rightenc;
+
   private CANSparkMax leftFront;
-  private CANSparkMax leftRear;
   private CANSparkMax rightFront;
+  private CANSparkMax leftRear;
   private CANSparkMax rightRear;
   private CANEncoder leftEncoder;
   private CANEncoder rightEncoder;
@@ -38,47 +47,58 @@ public class Drive extends SubsystemBase {
   DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
 
+  public void drive(double left, double right)
+  {
+    splitArcade.arcadeDrive(left, right);
+  }
 
+  //ks, kv, ka
+  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ksVolts, Constants.kvVoltSecondsPerMeter,Constants.kaVoltSecondsSquaredPerMeter);
   
   /** Creates a new Drive. */
   public Drive() { 
 
 
-        leftFront = new CANSparkMax(1, MotorType.kBrushless);
+        leftRomi = new PWM(0);
+        rightRomi = new PWM(1);
+
+        leftenc = new DigitalInput(4);
+        rightenc = new DigitalInput(6);
+
+        /*leftFront = new CANSparkMax(1, MotorType.kBrushless);
         leftFront.setInverted(false);
-        leftFront.setIdleMode(IdleMode.kBrake);
+        leftFront.setIdleMode(IdleMode.kBrake);*/
 
-        leftRear = new CANSparkMax(2, MotorType.kBrushless);
+        /*leftRear = new CANSparkMax(2, MotorType.kBrushless);
         leftRear.setInverted(false);
-        leftRear.setIdleMode(IdleMode.kBrake);
+        leftRear.setIdleMode(IdleMode.kBrake);*/
 
         // Set SlaveSpeedControllers to Follow MasterSpeedController
-        leftRear.follow(leftFront);
+        //leftRear.follow(leftFront);
 
-        rightFront = new CANSparkMax(3, MotorType.kBrushless);
+        /*rightFront = new CANSparkMax(3, MotorType.kBrushless);
         rightFront.setInverted(false);
-        rightFront.setIdleMode(IdleMode.kBrake);
+        rightFront.setIdleMode(IdleMode.kBrake);*/
 
-        rightRear = new CANSparkMax(4, MotorType.kBrushless);
+        /*rightRear = new CANSparkMax(4, MotorType.kBrushless);
         rightRear.setInverted(false);
-        rightRear.setIdleMode(IdleMode.kBrake);
+        rightRear.setIdleMode(IdleMode.kBrake);*/
 
         // Set SlaveSpeedControllers to Follow MasterSpeedController
-        rightRear.follow(rightFront);    
+        //rightRear.follow(rightFront);    
         
         splitArcade = new DifferentialDrive(leftFront, rightFront);
 
         //(highestGearTeethNumber, lowestGearTeethNumber, wheelDiameter)
         distancePerPulse = DistancePerPulse.get(0, 0, 0);
 
-        leftEncoder = leftFront.getEncoder();
+        /*leftEncoder = leftFront.getEncoder();
         leftEncoder.setPositionConversionFactor(distancePerPulse);
-        leftEncoder.setPosition(0);
+        leftEncoder.setPosition(0);*/
 
         rightEncoder = rightFront.getEncoder();
         rightEncoder.setPositionConversionFactor(distancePerPulse);
         rightEncoder.setPosition(0);
-
 
   }
 
@@ -121,9 +141,14 @@ public class Drive extends SubsystemBase {
     public void tankDriveVolts(double leftVolts, double rightVolts)
     {
         leftFront.setVoltage(leftVolts);
-        leftRear.setVoltage(leftVolts);
+        //leftRear.setVoltage(leftVolts);
         rightFront.setVoltage(-rightVolts);
-        rightRear.setVoltage(-rightVolts);    
+        //rightRear.setVoltage(-rightVolts);    
+    }
+
+    public SimpleMotorFeedforward getFeedforward()
+    {
+      return feedforward;
     }
 
 
