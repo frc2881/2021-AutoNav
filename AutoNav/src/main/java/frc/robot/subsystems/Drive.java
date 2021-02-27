@@ -10,8 +10,12 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -25,10 +29,11 @@ import frc.robot.utils.NavX;
 
 public class Drive extends SubsystemBase {
   
-  private PWM leftRomi;
-  private PWM rightRomi;
-  private DigitalInput leftenc;
-  private DigitalInput rightenc;
+  private Spark leftRomi;
+  private Spark rightRomi;
+  private Encoder leftenc;
+  private Encoder rightenc;
+  //private RomiGyro gyro;
 
   private CANSparkMax leftFront;
   private CANSparkMax rightFront;
@@ -54,16 +59,22 @@ public class Drive extends SubsystemBase {
 
   //ks, kv, ka
   SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ksVolts, Constants.kvVoltSecondsPerMeter,Constants.kaVoltSecondsSquaredPerMeter);
+
+
   
   /** Creates a new Drive. */
   public Drive() { 
 
 
-        leftRomi = new PWM(0);
-        rightRomi = new PWM(1);
+        leftRomi = new Spark(0);
+        rightRomi = new Spark(1);
 
-        leftenc = new DigitalInput(4);
-        rightenc = new DigitalInput(6);
+        leftenc = new Encoder(4, 5);
+        rightenc = new Encoder(6, 7);
+
+        //gyro = new RomiGyro();
+
+
 
         /*leftFront = new CANSparkMax(1, MotorType.kBrushless);
         leftFront.setInverted(false);
@@ -87,7 +98,7 @@ public class Drive extends SubsystemBase {
         // Set SlaveSpeedControllers to Follow MasterSpeedController
         //rightRear.follow(rightFront);    
         
-        splitArcade = new DifferentialDrive(leftFront, rightFront);
+        splitArcade = new DifferentialDrive(leftRomi, rightRomi);
 
         //(highestGearTeethNumber, lowestGearTeethNumber, wheelDiameter)
         distancePerPulse = DistancePerPulse.get(0, 0, 0);
@@ -96,9 +107,12 @@ public class Drive extends SubsystemBase {
         leftEncoder.setPositionConversionFactor(distancePerPulse);
         leftEncoder.setPosition(0);*/
 
-        rightEncoder = rightFront.getEncoder();
+        /*rightEncoder = rightFront.getEncoder();
         rightEncoder.setPositionConversionFactor(distancePerPulse);
-        rightEncoder.setPosition(0);
+        rightEncoder.setPosition(0);*/
+
+        leftenc.setDistancePerPulse(distancePerPulse);
+        rightenc.setDistancePerPulse(distancePerPulse);
 
   }
 
@@ -107,8 +121,11 @@ public class Drive extends SubsystemBase {
     // This method will be called once per scheduler run
 
 
-    m_odometry.update(m_gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    //m_odometry.update(m_gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    m_odometry.update(m_gyro.getRotation2d(), leftenc.getDistance(), rightenc.getDistance());
+
     }
+
 
     public void arcadeDrive(double xSpeed, double zRotation) {
       splitArcade.arcadeDrive(xSpeed, -zRotation, false);
@@ -122,14 +139,23 @@ public class Drive extends SubsystemBase {
       return m_gyro.getRotation2d().getDegrees();
     }
   
-    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    /*public DifferentialDriveWheelSpeeds getWheelSpeeds() {
       return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
+    }*/
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+      return new DifferentialDriveWheelSpeeds(leftenc.getRate(), rightenc.getRate());
     }
 
-    public void resetEncoders()
+    /*public void resetEncoders()
     {
       leftEncoder.setPosition(0);
       rightEncoder.setPosition(0);
+    }*/
+
+    public void resetEncoders()
+    {
+      resetEncoders();
     }
 
     public void resetOdometry(Pose2d pose)
@@ -140,9 +166,11 @@ public class Drive extends SubsystemBase {
 
     public void tankDriveVolts(double leftVolts, double rightVolts)
     {
-        leftFront.setVoltage(leftVolts);
+       leftRomi.setVoltage(leftVolts);
+       rightRomi.setVoltage(rightVolts);
+        //leftFront.setVoltage(leftVolts);
         //leftRear.setVoltage(leftVolts);
-        rightFront.setVoltage(-rightVolts);
+        //rightFront.setVoltage(-rightVolts);
         //rightRear.setVoltage(-rightVolts);    
     }
 
