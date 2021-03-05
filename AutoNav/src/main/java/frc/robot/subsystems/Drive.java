@@ -6,16 +6,10 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -26,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.DistancePerPulse;
 import frc.robot.utils.NavX;
+import frc.robot.utils.RomiGyro;
 
 public class Drive extends SubsystemBase {
   
@@ -33,7 +28,7 @@ public class Drive extends SubsystemBase {
   private Spark rightRomi;
   private Encoder leftenc;
   private Encoder rightenc;
-  //private RomiGyro gyro;
+  private RomiGyro gyro;
 
   private CANSparkMax leftFront;
   private CANSparkMax rightFront;
@@ -49,8 +44,8 @@ public class Drive extends SubsystemBase {
 
 
   DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(0);
-  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
-
+  //DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
   public void drive(double left, double right)
   {
@@ -72,7 +67,7 @@ public class Drive extends SubsystemBase {
         leftenc = new Encoder(4, 5);
         rightenc = new Encoder(6, 7);
 
-        //gyro = new RomiGyro();
+        gyro = new RomiGyro();
 
 
 
@@ -122,8 +117,7 @@ public class Drive extends SubsystemBase {
 
 
     //m_odometry.update(m_gyro.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    m_odometry.update(m_gyro.getRotation2d(), leftenc.getDistance(), rightenc.getDistance());
-
+    m_odometry.update(gyro.getRotation2d(), leftenc.getDistance(), rightenc.getDistance());
     }
 
 
@@ -136,32 +130,29 @@ public class Drive extends SubsystemBase {
     }
 
     public double getHeading(){
-      return m_gyro.getRotation2d().getDegrees();
+      //return m_gyro.getRotation2d().getDegrees();
+      return gyro.getRotation2d().getDegrees();
     }
   
-    /*public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-      return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
-    }*/
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+      //return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
       return new DifferentialDriveWheelSpeeds(leftenc.getRate(), rightenc.getRate());
     }
 
-    /*public void resetEncoders()
-    {
-      leftEncoder.setPosition(0);
-      rightEncoder.setPosition(0);
-    }*/
 
     public void resetEncoders()
     {
+      //leftEncoder.setPosition(0);
+      //rightEncoder.setPosition(0);
       resetEncoders();
     }
 
     public void resetOdometry(Pose2d pose)
     {
       resetEncoders();
-      m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+      //m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+      m_odometry.resetPosition(pose, gyro.getRotation2d());
     }
 
     public void tankDriveVolts(double leftVolts, double rightVolts)
