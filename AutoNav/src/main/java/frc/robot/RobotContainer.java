@@ -60,7 +60,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-      Joystick driver = new Joystick(0);
+      driver = new Joystick(0);
   }
 
   public double applyDeadband(double input, double deadband) {

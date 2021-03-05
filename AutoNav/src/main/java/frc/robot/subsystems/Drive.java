@@ -28,7 +28,6 @@ public class Drive extends SubsystemBase {
   private Spark rightRomi;
   private Encoder leftenc;
   private Encoder rightenc;
-  private RomiGyro gyro;
 
   private CANSparkMax leftFront;
   private CANSparkMax rightFront;
@@ -40,12 +39,14 @@ public class Drive extends SubsystemBase {
   private DifferentialDrive splitArcade;
 
 
-  NavX m_gyro = new NavX(SPI.Port.kMXP);
+  //NavX m_gyro = new NavX(SPI.Port.kMXP);
+  RomiGyro gyro = new RomiGyro();
+
 
 
   DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(0);
   //DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
-  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
+  DifferentialDriveOdometry m_odometry;
 
   public void drive(double left, double right)
   {
@@ -67,7 +68,7 @@ public class Drive extends SubsystemBase {
         leftenc = new Encoder(4, 5);
         rightenc = new Encoder(6, 7);
 
-        gyro = new RomiGyro();
+        
 
 
 
@@ -108,6 +109,8 @@ public class Drive extends SubsystemBase {
 
         leftenc.setDistancePerPulse(distancePerPulse);
         rightenc.setDistancePerPulse(distancePerPulse);
+
+        m_odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
   }
 
