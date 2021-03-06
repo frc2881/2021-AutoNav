@@ -32,7 +32,7 @@ private final DoubleSupplier m_getDriverRightX;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_getDriverLeftY.getAsDouble(), m_getDriverRightX.getAsDouble());
+    m_drive.arcadeDrive(-m_getDriverLeftY.getAsDouble(), -m_getDriverRightX.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
